@@ -1,0 +1,90 @@
+@startuml
+
+entity UTILIZATOR{
+  *utilizator_id <<PK>>
+}
+
+entity PROPRIETATE{
+  *proprietate_id <<PK>>
+  --
+  gazda_id <<FK>>
+}
+
+entity REZERVARE{
+  *rezervare_id <<PK>>
+  --
+  proprietate_id <<FK>>
+  client_id <<FK>>
+}
+
+entity PLATA{
+  
+  *plata_id <<PK>>
+  --
+  rezervare_id <<FK>>
+}
+
+entity RECENZIE{
+  *recenzie_id <<PK>>
+  --
+  rezervare_id <<FK>>
+}
+
+entity PROPRIETATE_FACILITATE{
+  *proprietate_id <<PK, FK>>
+  *facilitate_id <<PK, FK>>
+}
+
+entity WISHLIST{
+  *utilizator_id <<PK, FK>>
+  *proprietate_id <<PK, FK>>
+}
+
+entity IMAGINI_PROPRIETATE{
+  *imagine_id <<PK>>
+  --
+  proprietate_id <<FK>>
+}
+
+entity DISPONIBILITATE{
+  *disponibilitate_id <<PK>>
+  --
+  proprietate_id <<FK>>
+}
+
+entity ROL{
+  *rol_id <<PK>>
+}
+
+entity UTILIZATOR_ROL{
+  *utilizator_id <<PK, FK>>
+  *rol_id <<PK, FK>>
+}
+
+entity FACILITATE{
+  *facilitate_id <<PK>>
+}
+
+
+UTILIZATOR ||--o{ UTILIZATOR_ROL
+ROL ||--o{ UTILIZATOR_ROL
+
+UTILIZATOR ||--o{ PROPRIETATE
+UTILIZATOR ||--o{ REZERVARE
+PROPRIETATE ||--o{ REZERVARE
+
+REZERVARE ||--o| PLATA
+REZERVARE ||--o| RECENZIE
+
+PROPRIETATE ||--o{ PROPRIETATE_FACILITATE
+FACILITATE ||--o{ PROPRIETATE_FACILITATE
+
+PROPRIETATE ||--o{ IMAGINI_PROPRIETATE
+PROPRIETATE ||--o{ DISPONIBILITATE
+
+UTILIZATOR ||--o{ WISHLIST
+PROPRIETATE ||--o{ WISHLIST
+
+
+
+@enduml
