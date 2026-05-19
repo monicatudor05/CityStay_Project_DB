@@ -210,7 +210,7 @@ In ceea ce priveste regulile de functionare ale sistemului, un utilizator poate 
 
 ## 6.Realizarea diagramei entitate-relatie corespunzatoare descrierii de la punctele 3-5
 
-![ERD](images/diagram_erd2.svg)
+![ERD](images/diagram_erd3.svg)
 
 
 ## 7.Realizarea diagramei conceptuale corespunzatoare diagramei entitate-relatie proiectate la punctul 6.
