@@ -124,31 +124,31 @@ In ceea ce priveste regulile de functionare ale sistemului, un utilizator poate 
 
 |atribut|tip de date|constrangeri|valori posibile/exemple|observatii|
 |--------|-----------|------------|-----------------------|----------|
-|utilizator_id|NUMBER(20)|PK|678644|
-|prenume|VARCHAR(50)| |Jane
-|nume|VARCHAR(50)| |Doe|
-|email|VARCHAR(50)| |janedoe@gmail.com|
-|telefon|VARCHAR(20)| | 
-|parola_hash|VARCHAR(225)| | Passworrd!@.
-|data_nasterii|DATE| |10.12.1999
-|poza_profil|VARCHAR(225)| | img.jpg
-|data_creare|DATETIME| | 12.12.2015
+|utilizator_id|NUMBER(30)|PK|1|SEQUENCE(se incrementeaza cu 1 la fiecare adaugare de utilizator)
+|prenume|VARCHAR(50)| |Jane| NOT NULL
+|nume|VARCHAR(50)| |Doe| NOT NULL
+|email|VARCHAR(50)| |janedoe@gmail.com| NOT NULL
+|telefon|VARCHAR(20)| +40 O712348728| |NOT NULL
+|parola_hash|VARCHAR(225)| | Password!@.|NOT NULL
+|data_nasterii|DATE| |10.12.1999|NOT NULL
+|poza_profil|VARCHAR(225)| | img.jpg|NOT NULL
+|data_creare|TIMESTAMP| | 12.12.2015
 
 
 ## Proprietate:
 |atribut|tip de date|constrangeri|valori posibile/exemple|observatii|
 |--------|-----------|------------|-----------------------|----------|
-|proprietate_id|NUMBER(30)|PK|4567765
-|gazda_id|NUMBER(30)|FK|5675678
+|proprietate_id|NUMBER(30)|PK|1/2/3|SEQUENCE(se incrementeaza cu 1)
+|gazda_id|NUMBER(30)|FK|1/2/3| gazda_id = utilizator_id
 |nume_proprietate|VARCHAR(225)| |Penthouse London|
-|descriere|TEXT| |
-|tip_proprietate|VARCHAR(100)| | Penthouse
-|nr_maxim_persoane|NUMBER(50)| | 
-|nr_dormitoare|NUMBER(50)| |
-|nr_bai|NUMBER(50)| |
-|nr_paturi|NUMBER(100)| |
-|pret_noapte|DECIMAL(10,2)| |
-|data_creare|DATETIME| |
+|descriere|TEXT/CLOB| |
+|tip_proprietate|VARCHAR(100)| | penthouse/apartment/house/mansion| NOT NULL 
+|nr_maxim_persoane|NUMBER(50)| | NOT NULL(trebuie sa fie >=1 si <=30)
+|nr_dormitoare|NUMBER(50)| |NOT NULL(trebuie sa fie >=1 si <=30)
+|nr_bai|NUMBER(50)| |NOT NULL(trebuie sa fie >=1 si <=30)
+|nr_paturi|NUMBER(100)| |NOT NULL(trebuie sa fie >=1 si <=30)
+|pret_noapte|DECIMAL(10,2)| | NOT NULL(trebuie sa fie >0)
+|data_creare|DATETIME/TIMESTAMP| | DEFAULT CURRENT_TIMESTAMP
 
 ## Rezervare:
 |atribut|tip de date|constrangeri|valori posibile/exemple|observatii|
@@ -170,14 +170,14 @@ In ceea ce priveste regulile de functionare ale sistemului, un utilizator poate 
 |suma|DECIMAL(10,2)| |
 |data_plata|DATETIME| |
 |status_plata| VARCHAR(50)| |Confirmata\In asteptare\Refuzata
-|metoda_plata| VARCHAR(50)| |Card\PayPal
+|metoda_plata| VARCHAR(50)| |Card\PayPal\Klarna
 
 ## Recenzie:
 |atribut|tip de date|constrangeri|valori posibile/exemple|observatii|
 |--------|-----------|------------|-----------------------|----------|
 |recenzie_id|NUMBER(30)|PK| |
 |rezervare_id|NUMBER(30)|FK| |
-|comentariu|TEXT| |
+|comentariu|TEXT/CLOB| |
 |rating|INT| |
 |data_recenzie|DATETIME| |
 
@@ -192,7 +192,7 @@ In ceea ce priveste regulile de functionare ale sistemului, un utilizator poate 
 ## Imagini_Proprietate
 |atribut|tip de date|constrangeri|valori posibile/exemple|observatii|
 |--------|-----------|------------|-----------------------|----------|
-|imagine_id|NUMBER(100)|PK| |
+|imagine_id|NUMBER(30)|PK| |
 |proprietate_id|NUMBER(30)|FK|
 |url_imagine|VARCHAR(255)| |http://...
 |este_principala|BOOLEAN| |DA\NU
@@ -216,6 +216,114 @@ In ceea ce priveste regulile de functionare ale sistemului, un utilizator poate 
 ## 7.Realizarea diagramei conceptuale corespunzatoare diagramei entitate-relatie proiectate la punctul 6.
 
 ![Conceptual Diagram](images/conceptual_diagram.svg)
+
+## 8.Enumerarea schemelor relationale corespunzatoare diagramei conceptuale proiectate la punctul 7.
+
+- **UTILIZATOR**(utilizator_id **PK**)
+- **ROL**(rol_id **PK**)
+- **UTILIZATOR_ROL**(utilizator_id **PK, FK**, rol_id **PK, FK**)
+- **PROPRIETATE**(proprietate_id **PK**, gazda_id **FK**)
+- **FACILITATE**(facilitate_id **PK**)
+- **PROPRIETATE_FACILITATE**(proprietate_id **PK,FK**, facilitate_id **PK, FK**)
+- **DISPONIBILITATE**(disponibilitate_id **PK**)
+- **IMAGINI_PROPRIETATE**(imagine_id **PK**, proprietate_id **FK**)
+- **REZERVARE**(rezervare_id **PK**, proprietate_id **FK**, client_id **FK**)
+- **PLATA**(plata_id **PK**, rezervare_id **FK**)
+- **RECENZIE**(recenzie_id **PK**, rezervare_id **FK**)
+- **WISHLIST**(utilizator_id **PK, FK**, proprietate_id **PK, FK**)
+
+
+## 9. Realizarea normalizarii pana la forma normala 3(FN1-FN3).
+
+## **Non-FN1->FN1**
+
+**PROPRIETATE**(proprietate_id, gazda_id, nume_proprietate, descriere, tip_proprietate, nr_maxim_persoane, nr_dormitoare, nr_bai, nr_paturi, pret_noapte, data_creare, facilitati)
+
+***facilitati*** -> este un atribut multiplu(ex:"wifi, piscina, parcare") --> **nu este FN1**
+
+### Aducere in FN1:
+
+
+
+**PROPRIETATE**(proprietate_id, gazda_id,nume_proprietate, descriere, tip_proprietate, nr_maxim_persoane, nr_dormitoare, nr_bai, nr_paturi, pret_noapte, data_creare)
+
+**FACILITATE**(facilitate_id, nume_facilitate)
+**PROPRIETATE_FACILITATE**(proprietate_id, facilitate_id)
+
+---
+
+## **Non-FN2->FN2**
+
+
+**REZERVARE-PERSOANA**(rezervare_id, proprietate_id,  client_id, nume_client, prenume_client,email_client, telefon_client,  data_checkin, data_checkout, nr_persoane, pret)
+
+F={
+*rezervare_id* ->( proprietate_id, client_id, data_checkin, data_checkout, nr_persoane, pret),
+
+*client_id* -> (nume_client, prenume_client, email_client, telefon_client)
+}
+
+***nume, prenume, email, telefon*** depind doar de client_id -> dependenta partiala -> **nu este FN2**
+
+
+### Aducere in FN2
+
+**UTILIZATOR**(utilizator_id, prenume, nume, email, telefon, parola_hash, data_nasterii, poza_profil, data_creare)
+
+**REZERVARE**(rezervare_id, proprietate_id, client_id, data_checkin, data_checkout, nr_persoane, pret)
+
+
+## Non-FN3->FN3
+
+
+**PLATA**(plata_id, rezervare_id, suma, data_plata, status_plata, metoda_plata, email_client, nume_client, prenume_client)
+
+plata_id -> rezervare_id -> client_id(*email_client, nume_client, prenume_client*)
+
+*email_client, nume_client, prenume_client* descriu **client**, nu **plata** -> **dependenta tranzitiva** -> **Non-FN3**
+
+### Aducere in FN3:
+
+**UTILIZATOR**(utiliazator_id, prenume, nume, email, telefon, parola_hash, data_nasterii, poza_profil, data_creare)
+
+**REZERVARE**(rezervare_id, proprietate_id, client_id, data_checkin, data_checkout, nr_persoane, pret)
+
+**PLATA**(plata_id, rezervare_id, suma, data_plata, status_plata, metoda_plata)
+
+---
+
+## 10.Crearea unei secvente ce va fi utilizata in inserarea inregistrarilor in tabele(ex. 11)
+
+CREATE SEQUENCE seq_utilizator START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_rol START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_proprietate START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_facilitate START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_imagine START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_disponibilitate START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_rezervare START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_plata START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_recenzie START WITH 1 INCREMENT BY 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
