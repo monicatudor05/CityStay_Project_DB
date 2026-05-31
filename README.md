@@ -368,7 +368,7 @@ CREATE SEQUENCE seq_recenzie START WITH 1 INCREMENT BY 1;
 [Inserare date Wishlist](screenhots/screenshot19.png)
 
 
-## 12.Formulati în limbaj natural și implementati 5 cereri SQL complexe
+## 12.Formulati in limbaj natural si implementati 5 cereri SQL complexe
 
 [SQL file](12.sql)
 
