@@ -1,0 +1,168 @@
+ SET DEFINE OFF;
+
+drop sequence seq_utilizator;
+drop sequence seq_rol;
+drop sequence seq_proprietate;
+drop sequence seq_facilitate;
+drop sequence seq_imagine;
+drop sequence seq_disponibilitate;
+drop sequence seq_rezervare;
+drop sequence seq_plata;
+drop sequence seq_recenzie;
+
+
+drop table wishlist;
+drop table recenzie;
+drop table plata;
+drop table rezervare;
+drop table disponibilitate;
+drop table imagini_proprietate;
+drop table proprietate_facilitate;
+drop table facilitate;
+drop table proprietate;
+drop table utilizator_rol;
+drop table rol;
+drop table utilizator;
+
+
+create sequence seq_utilizator start with 1 increment by 1;
+create sequence seq_rol start with 1 increment by 1;
+create sequence seq_proprietate start with 1 increment by 1;
+create sequence seq_facilitate start with 1 increment by 1;
+create sequence seq_imagine start with 1 increment by 1;
+create sequence seq_disponibilitate start with 1 increment by 1;
+create sequence seq_rezervare start with 1 increment by 1;
+create sequence seq_plata start with 1 increment by 1;
+create sequence seq_recenzie start with 1 increment by 1;
+
+
+create table utilizator (
+   utilizator_id number(30) primary key,
+   prenume       varchar2(50) not null,
+   nume          varchar2(50) not null,
+   email         varchar2(50) not null,
+   telefon       varchar2(20) not null,
+   parola_hash   varchar2(225) not null,
+   data_nasterii date not null,
+   poza_profil   varchar2(225) not null,
+   data_creare   timestamp default current_timestamp
+);
+
+create table rol (
+   rol_id   number(30) primary key,
+   nume_rol varchar2(10) not null check ( nume_rol in ( 'gazda',
+                                                        'oaspete' ) )
+);
+
+create table utilizator_rol (
+   utilizator_id number(30)
+      references utilizator ( utilizator_id ),
+   rol_id        number(30)
+      references rol ( rol_id ),
+   primary key ( utilizator_id,
+                 rol_id )
+);
+-- clob = text in oracle
+create table proprietate (
+   proprietate_id    number(30) primary key,
+   gazda_id          number(30)
+      references utilizator ( utilizator_id ),
+   nume_proprietate  varchar2(225) not null,
+   descriere         clob not null,
+   tip_proprietate   varchar2(100) not null check ( tip_proprietate in ( 'penthouse',
+                                                                       'apartment',
+                                                                       'house',
+                                                                       'mansion' ) ),
+   nr_maxim_persoane number(30) not null check ( nr_maxim_persoane >= 1
+      and nr_maxim_persoane <= 30 ),
+   nr_dormitoare     number(30) not null check ( nr_dormitoare >= 1
+      and nr_dormitoare <= 30 ),
+   nr_bai            number(30) not null check ( nr_bai >= 1
+      and nr_bai <= 30 ),
+   nr_paturi         number(30) not null check ( nr_paturi >= 1
+      and nr_paturi <= 30 ),
+   pret_noapte       decimal(10,2) not null check ( pret_noapte > 0 ),
+   data_creare       timestamp default current_timestamp
+);
+
+create table facilitate (
+   facilitate_id   number(30) primary key,
+   nume_facilitate varchar2(225) default 'wifi' not null
+);
+
+create table proprietate_facilitate (
+   facilitate_id  number(30)
+      references facilitate ( facilitate_id ),
+   proprietate_id number(30)
+      references proprietate ( proprietate_id ),
+   primary key ( proprietate_id,
+                 facilitate_id )
+);
+
+create table imagini_proprietate (
+   imagine_id      number(30) primary key,
+   proprietate_id  number(30)
+      references proprietate ( proprietate_id ),
+   url_imagine     varchar2(225) not null,
+   este_principala number(1) default 1 check ( este_principala in ( 0,
+                                                                    1 ) ),
+   data_upload     timestamp default current_timestamp
+);
+
+
+create table disponibilitate (
+   disponibilitate_id         number(30) primary key,
+   proprietate_id             number(30)
+      references proprietate ( proprietate_id ),
+   data_disponibilitate_start date not null,
+   data_disponibilitate_end   date not null,
+   status_disponibilitate     varchar2(50) default 'disponibil' check ( status_disponibilitate in ( 'disponibil',
+                                                                                                'indisponibil' ) ),
+   pret_special               decimal(10,2) check ( pret_special > 0 )
+);
+
+create table rezervare (
+   rezervare_id   number(30) primary key,
+   proprietate_id number(30)
+      references proprietate ( proprietate_id ),
+   client_id      number(30)
+      references utilizator ( utilizator_id ),
+   data_checkin   date not null,
+   data_checkout  date not null,
+   nr_persoane    number(30) check ( nr_persoane >= 1
+      and nr_persoane <= 30 ) not null,
+   pret           decimal(10,2) check ( pret > 0 ) not null
+);
+
+create table plata (
+   plata_id     number(30) primary key,
+   rezervare_id number(30)
+      references rezervare ( rezervare_id ),
+   suma         decimal(10,2) check ( suma > 0 ) not null,
+   data_plata   date default current_timestamp,
+   status_plata varchar2(50) check ( status_plata in ( 'confirmata',
+                                                       'in asteptare',
+                                                       'refuzata' ) ) not null,
+   metoda_plata varchar2(50) check ( metoda_plata in ( 'card',
+                                                       'paypal',
+                                                       'klarna' ) ) not null
+);
+
+create table recenzie (
+   recenzie_id   number(30) primary key,
+   rezervare_id  number(30)
+      references rezervare ( rezervare_id ),
+   comentariu    clob not null,
+   rating        int check ( rating > 0
+      and rating <= 5 ),
+   data_recenzie date not null
+);
+
+create table wishlist (
+   utilizator_id  number(30)
+      references utilizator ( utilizator_id ),
+   proprietate_id number(30)
+      references proprietate ( proprietate_id ),
+   primary key ( utilizator_id,
+                 proprietate_id )
+);
