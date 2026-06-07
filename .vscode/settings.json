@@ -1,0 +1,22 @@
+{
+    "sqltools.connections": [
+        {
+            "oracleOptions": {
+                "privilege": "Normal",
+                "thickMode": false,
+                "autoCommit": false,
+                "lowerCase": false,
+                "limitPrefetchRows": false
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 1521,
+            "driver": "Oracle",
+            "name": "CityStayDB",
+            "database": "xepdb1",
+            "username": "system",
+            "password": "parola123"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

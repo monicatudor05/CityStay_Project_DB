@@ -1856,4 +1856,61 @@ db.proprietati.find().sort({
 ```
 
 
+## 20. SQL Injection
+
+**SQL Injection**(SQLi) este una dintre cele mai frecvente vulnerabilitati in aplicatiile care lucreaza cu baze de date. Apare atunci cand datele introduse de utilizator(cookie, formular etc.) sunt concatenate direct intr-o interogare SQL, fara a fi tratate ca niste simple valori. Astfel, un atacator poate injecta cod SQL propriu in baza de date.
+
+### Cum functioneaza:
+
+Presupunem un login implementat in JavaScript
+
+```javascript
+
+//cod vulnerabil
+const email = req.body.email;
+const parola = req.body.parola;
+
+const query=`SELECT FROM utilizator WHERE email = '${email}' AND parola='${parola}';`
+const result = await pool.query(query);
+```
+
+Daca atacatorul introduce in campul de email:
+
+```sql
+' OR '1'='1' --
+```
+
+
+Interogarea devine:
+```sql
+SELECT * FROM utilizator WHERE email = '' OR '1'='1';
+```
+
+Conditia `'1'='1'` este mereu adevarata, iar `--` comenteaza restul query-ului, astfel atacatorul **fara sa stie nicio parola** poate afla credentialele din baza de date.
+
+
+### Tipuri de SQLi:
+
+- **In-band**: atacatorul vede direct rezultatul
+- **Blind SQLi**: aplicatia nu afiseaza direct rezultatul, insa atacatorul poate deduce informatii dupa comportament
+- **Error-based**: atacatorul forteaza eroari care expun structura bazei de date(ex. Introduce mai multe sql coduri proprii unde deduce ce tip de baze de date este pentru a afla cum se marcheaza comentariul: `--`, `//`, `/**/`)
+
+
+### Cum prevenim:
+
+#### Folosim interogari parametrizate, adica valorile sunt trimise separat de query, deci baza de date le trateaza strict ca pe niste date
+
+```javascript
+//cod corect
+const email = req.body.email;
+const parola = req.body.parola;
+
+const result = await pool.query(
+    'SELECT * FROM utilizator WHERE email=$1 AND parola = $2',[email,parola]
+);
+
+
+```
+
+Aici daca cineva insereaza ` ' OR '1'='1' --`, acest text este cautat literal ca un simplu email si nu se gaseste nimic, nu se mai executa ca un SQL query. 
 
